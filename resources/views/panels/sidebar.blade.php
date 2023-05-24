@@ -41,7 +41,7 @@ $configData = Helper::applClasses();
               </g>
             </svg>
           </span>
-          <h2 class="brand-text">Vuexy</h2>
+          <h2 class="brand-text">Medsecure</h2>
         </a>
       </li>
       <li class="nav-item nav-toggle">
@@ -57,6 +57,7 @@ $configData = Helper::applClasses();
   <div class="main-menu-content">
     <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
       {{-- Foreach menu item starts --}}
+
       @if (isset($menuData[0]))
         @foreach ($menuData[0]->menu as $menu)
           @if (isset($menu->navheader))

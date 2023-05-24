@@ -8,9 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
+        'google2fa_secret',
     ];
 
     /**
@@ -41,4 +46,42 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function isEmailConfirmed()
+    {
+        return $this->google2fa_enable;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
+
+    public function role() {
+        return $this->belongsTo(Role::class);
+    }
+    public function userProfile() {
+        return $this->hasOne(UserProfile::class);
+    }
+    public function patientProfile() {
+        return $this->hasOne(PatientProfile::class);
+    }
+    public function providerProfile() {
+        return $this->hasOne(ProviderProfile::class);
+    }
+    public function appointments() {
+        return $this->hasMany(Appointment::class);
+    }
+    public function files() {
+        return $this->hasMany(File::class);
+    }
+    public function medicalRecords() {
+        return $this->hasMany(MedicalRecord::class);
+    }
+    public function alerts() {
+        return $this->hasMany(Alert::class);
+    }
+    public function notifications() {
+        return $this->hasMany(Notification::class);
+    }
 }

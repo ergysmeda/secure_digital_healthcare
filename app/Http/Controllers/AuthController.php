@@ -2,13 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AuthenticationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+use PragmaRX\Google2FALaravel\Google2FA;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    protected AuthenticationService $authenticationService;
+
+    public function __construct(AuthenticationService $authenticationService)
+    {
+        $this->authenticationService = $authenticationService;
+
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
+
+    public function forgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+    public function showConfirm( Google2FA $google2fa)
+    {
+        return view('auth.confirm')->with(
+            'QR_Image',
+            $this->authenticationService->generateUserQR($google2fa)
+        );
+    }
+
+
+
+    public function verify2FA(Request $request, Google2FA $google2fa)
+    {
+
+
+        $user = Auth::user();
+
+        $secret = $request->input('secret');
+
+        $valid = $google2fa->verifyKey($user->google2fa_secret, $secret);
+
+        if ($valid) {
+            $this->authenticationService->verifyUserQr($request);
+            $request->session()->regenerate();
+            return redirect()->route('home')->with('success', 'Logged in successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Invalid verification code, please try again.');
+    }
+
     /**
      * Create user
      *
@@ -18,28 +74,21 @@ class AuthController extends Controller
      * @param  [string] password_confirmation
      * @return [string] message
      */
-    public function register(Request $request)
+    public function register(Request $request, Google2FA $google2fa)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|',
-            'c_password'=>'required|same:password',
-        ]);
 
-        $user = new User([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
-        if($user->save()){
-            return response()->json([
-                'message' => 'Successfully created user!'
-            ], 201);
-        }else{
-            return response()->json(['error'=>'Provide proper details']);
+        $validator = $this->authenticationService->registerValidator($request);
+
+        $user = $this->authenticationService->registerUser($request,$google2fa);
+
+        if ($user->save()) {
+            Auth::login($user); // Authenticate the user
+            return redirect()->route('2fa')->with('user_id', $user->id);
+        } else {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
     }
+
     /**
      * Login user and create token
      *
@@ -50,32 +99,26 @@ class AuthController extends Controller
      * @return [string] token_type
      * @return [string] expires_at
      */
+
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'remember_me' => 'boolean'
         ]);
-        $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
-        return response()->json([
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString()
-        ]);
+
+        $user = User::where('email', $request->input('email'))->first();
+
+        if (!(Hash::check($request->input('password').$request->input('email'), $user->password))) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+
+        Auth::login($user); // Authenticate the user
+        return redirect()->route('2fa')->with('user_id', $user->id);
     }
+
+
 
     public function user(Request $request)
     {
@@ -89,9 +132,11 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

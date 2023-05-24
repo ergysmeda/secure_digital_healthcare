@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../labet e sdh/.idea/labet e sdh.iml" filepath="$PROJECT_DIR$/../../labet e sdh/.idea/labet e sdh.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/secure_digital_healthcare.iml" filepath="$PROJECT_DIR$/.idea/secure_digital_healthcare.iml" />
     </modules>
   </component>

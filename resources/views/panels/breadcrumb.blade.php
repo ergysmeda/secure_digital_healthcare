@@ -40,10 +40,6 @@
             <span class="align-middle">Chat</span>
           </a>
           <a class="dropdown-item" href="#">
-            <i class="me-1" data-feather="mail"></i>
-            <span class="align-middle">Email</span>
-          </a>
-          <a class="dropdown-item" href="#">
             <i class="me-1" data-feather="calendar"></i>
             <span class="align-middle">Calendar</span>
           </a>

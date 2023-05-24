@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaterkitController;
 use App\Http\Controllers\LanguageController;
+use \App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,16 +15,26 @@ use App\Http\Controllers\LanguageController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// Login Route
+Route::get('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('2fa', [AuthController::class, 'showConfirm'])->name('2fa');
 
-Route::get('/', [StaterkitController::class, 'home'])->name('home');
-Route::get('home', [StaterkitController::class, 'home'])->name('home');
-// Route Components
-Route::get('layouts/collapsed-menu', [StaterkitController::class, 'collapsed_menu'])->name('collapsed-menu');
-Route::get('layouts/full', [StaterkitController::class, 'layout_full'])->name('layout-full');
-Route::get('layouts/without-menu', [StaterkitController::class, 'without_menu'])->name('without-menu');
-Route::get('layouts/empty', [StaterkitController::class, 'layout_empty'])->name('layout-empty');
-Route::get('layouts/blank', [StaterkitController::class, 'layout_blank'])->name('layout-blank');
 
+// Registration Route
+Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
+
+Route::post('login', [AuthController::class, 'login'])->name('login.post');
+Route::post('register', [AuthController::class, 'register'])->name('register.post');
+Route::post('/2fa', [AuthController::class, 'verify2FA'])->name('2fa.verify');
+
+Route::group(['middleware' => ['auth:web', 'checkConfirmation']], function () {
+
+    Route::get('/', [StaterkitController::class, 'home'])->name('home');
+    Route::get('home', [StaterkitController::class, 'home'])->name('home');
 
 // locale Route
-Route::get('lang/{locale}', [LanguageController::class, 'swap']);
+    Route::get('lang/{locale}', [LanguageController::class, 'swap']);
+
+});
