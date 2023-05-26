@@ -57,8 +57,24 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->attributes['password'] = bcrypt($value);
     }
 
-    public function role() {
-        return $this->belongsTo(Role::class);
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+    /**
+     * Check if the user has any of the specified roles.
+     *
+     * @param array|string $roles
+     * @return bool
+     */
+    public function hasAnyRole($roles): bool
+    {
+
+        if (is_array($roles)) {
+            return $this->roles()->whereIn('role_name', $roles)->exists();
+        }
+
+        return $this->roles()->where('role_name', $roles)->exists();
     }
     public function userProfile() {
         return $this->hasOne(UserProfile::class);

@@ -93,7 +93,7 @@
               @endif
           </span>
           <span class="user-status">
-            {{Auth::user()->role->role_name}}
+            {{Auth::user()->roles->first()->role_name}}
           </span>
         </div>
         <span class="avatar">

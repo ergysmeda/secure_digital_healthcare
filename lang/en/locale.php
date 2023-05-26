@@ -2,6 +2,8 @@
 
 return [
     "Home" => "Home",
+    "User management" => "User management",
+    "Users" => "Users",
     "Starter Kit" => "Starter Kit",
     "Apps & Pages" => "Apps & Pages",
     "User Interface" => "User Interface",

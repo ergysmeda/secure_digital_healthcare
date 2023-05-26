@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StaterkitController;
 use App\Http\Controllers\LanguageController;
 use \App\Http\Controllers\AuthController;
-
+use \App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,7 +18,7 @@ use \App\Http\Controllers\AuthController;
 // Login Route
 Route::get('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout.web');
 Route::get('2fa', [AuthController::class, 'showConfirm'])->name('2fa');
 
 
@@ -32,7 +32,14 @@ Route::post('/2fa', [AuthController::class, 'verify2FA'])->name('2fa.verify');
 Route::group(['middleware' => ['auth:web', 'checkConfirmation']], function () {
 
     Route::get('/', [StaterkitController::class, 'home'])->name('home');
-    Route::get('home', [StaterkitController::class, 'home'])->name('home');
+
+    Route::group(['middleware' => ['role:admin']], function () {
+        Route::prefix('/user')->group(function () {
+            Route::get('/list', [UserController::class, 'list']);
+        });
+
+    });
+
 
 // locale Route
     Route::get('lang/{locale}', [LanguageController::class, 'swap']);

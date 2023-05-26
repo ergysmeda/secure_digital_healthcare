@@ -57,6 +57,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         '2fa' => \PragmaRX\Google2FALaravel\Middleware::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
         'checkConfirmation' => \App\Http\Middleware\CheckConfirmation::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
