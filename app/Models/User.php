@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Searchable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Searchable;
 
 
     protected $table = 'users';
@@ -24,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'profile_picture',
         'role_id',
         'google2fa_secret',
     ];
@@ -57,9 +59,9 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->attributes['password'] = bcrypt($value);
     }
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
     }
     /**
      * Check if the user has any of the specified roles.
@@ -67,14 +69,9 @@ class User extends Authenticatable implements MustVerifyEmail
      * @param array|string $roles
      * @return bool
      */
-    public function hasAnyRole($roles): bool
+    public function hasRole($role): bool
     {
-
-        if (is_array($roles)) {
-            return $this->roles()->whereIn('role_name', $roles)->exists();
-        }
-
-        return $this->roles()->where('role_name', $roles)->exists();
+        return in_array(strtolower($this->role->role_name),$role);
     }
     public function userProfile() {
         return $this->hasOne(UserProfile::class);

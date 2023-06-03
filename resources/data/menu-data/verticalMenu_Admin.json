@@ -1,0 +1,22 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Home",
+      "icon": "home",
+      "slug": "home"
+    }, {
+          "name": "User management",
+          "icon": "user",
+          "dropdown": "1",
+          "slug": "user-management",
+          "submenu": [
+              {
+                  "url": "user/list",
+                  "name": "List",
+                  "slug": "list"
+              }
+          ]
+      }
+  ]
+}

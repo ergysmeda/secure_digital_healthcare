@@ -11,15 +11,7 @@ use App\Repositories\Models\RoleRepository;
 
 class AuthenticationService
 {
-    public RoleRepository $roleRepository;
 
-    /**
-     * @param RoleRepository $roleRepository
-     */
-    public function __construct(RoleRepository $roleRepository)
-    {
-        $this->roleRepository = $roleRepository;
-    }
 
     public function generateUserQR( Google2FA $google2fa)
     {
@@ -54,9 +46,9 @@ class AuthenticationService
     public function registerValidator($request)
     {
         return Validator::make($request->all(), [
-            'register-username' => 'required|string',
-            'register-email' => 'required|string|email|unique:users,email',
-            'register-password' => [
+            'username' => 'required|unique:users,name',
+            'email' => 'required|email|unique:users,email',
+            'password' => [
                 'required',
                 'string',
                 'min:8', // Minimum length of 8 characters
@@ -66,15 +58,15 @@ class AuthenticationService
         ]);
     }
 
-    public function registerUser($request,$google2fa)
+    public function registerUser($validator,$google2fa)
     {
 
         return new User([
-            'name' => $request->input('register-username'),
-            'email' => $request->input('register-email'),
-            'password' =>  $request->input('register-password').$request->input('register-email') ,
+            'name' => $validator['username'],
+            'email' => $validator['email'],
+            'password' =>  $validator['password'].$validator['email'] ,
             'google2fa_secret' =>  $google2fa->generateSecretKey(),
-            'role_id' =>  $this->roleRepository->getIdByRoleName('Patient'),
+            'role_id' =>  $validator['role'],
         ]);
     }
 }

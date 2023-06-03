@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\Models\RoleRepository;
 use App\Services\AuthenticationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,12 @@ class AuthController extends Controller
 {
 
     protected AuthenticationService $authenticationService;
+    public RoleRepository $roleRepository;
 
-    public function __construct(AuthenticationService $authenticationService)
+    public function __construct(AuthenticationService $authenticationService,RoleRepository $roleRepository)
     {
         $this->authenticationService = $authenticationService;
+        $this->roleRepository = $roleRepository;
 
     }
 
@@ -77,9 +80,11 @@ class AuthController extends Controller
     public function register(Request $request, Google2FA $google2fa)
     {
 
-        $validator = $this->authenticationService->registerValidator($request);
+        $validator = $this->authenticationService->registerValidator($request)->getData();
 
-        $user = $this->authenticationService->registerUser($request,$google2fa);
+        $validator['role'] = $this->roleRepository->getIdByRoleName('Patient');
+
+        $user = $this->authenticationService->registerUser($validator,$google2fa);
 
         if ($user->save()) {
             Auth::login($user); // Authenticate the user

@@ -82,8 +82,8 @@
                             <input
                                 type="text"
                                 class="form-control @error('register-username') is-invalid @enderror"
-                                id="register-username"
-                                name="register-username"
+                                id="username"
+                                name="username"
                                 placeholder="johndoe"
                                 aria-describedby="register-username"
                                 tabindex="1"
@@ -98,8 +98,8 @@
                             <input
                                 type="text"
                                 class="form-control @error('register-email') is-invalid @enderror"
-                                id="register-email"
-                                name="register-email"
+                                id="email"
+                                name="email"
                                 placeholder="john@example.com"
                                 aria-describedby="register-email"
                                 tabindex="2"
@@ -117,8 +117,8 @@
                                 <input
                                     type="password"
                                     class="form-control form-control-merge @error('register-password') is-invalid @enderror"
-                                    id="register-password"
-                                    name="register-password"
+                                    id="password"
+                                    name="password"
                                     placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                     aria-describedby="register-password"
                                     tabindex="3"

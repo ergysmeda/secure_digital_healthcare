@@ -10,10 +10,18 @@ class RecordShare extends Model
     use HasFactory;
 
     protected $table = 'record_shares';
-    public function record() {
+    protected $fillable = [
+        'record_id',
+        'shared_with_user_id'
+    ];
+
+    public function record()
+    {
         return $this->belongsTo(MedicalRecord::class, 'record_id');
     }
-    public function sharedWith() {
+
+    public function sharedWith()
+    {
         return $this->belongsTo(User::class, 'shared_with_user_id');
     }
 }

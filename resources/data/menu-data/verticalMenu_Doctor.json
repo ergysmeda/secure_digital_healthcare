@@ -1,0 +1,49 @@
+{
+    "menu": [
+        {
+            "url": "/",
+            "name": "Home",
+            "icon": "home",
+            "slug": "home"
+        },
+        {
+            "url": "/profile/index",
+            "name": "Profile",
+            "icon": "user",
+            "slug": "profile"
+        },
+        {
+            "url": "/invoices/list",
+            "name": "Invoices & Payment",
+            "icon": "coffee",
+            "slug": "invoices-payments"
+        }, {
+            "url": "/appointments/list",
+            "name": "Appointments",
+            "icon": "calendar",
+            "slug": "appointments"
+        },{
+            "name": "Communications",
+            "icon": "video",
+            "dropdown": "1",
+            "slug": "communications",
+            "submenu": [
+                {
+                    "url": "/video-chat",
+                    "name": "Video Consultations",
+                    "slug": "video-consultations"
+                },
+                {
+                    "url": "/chat/list",
+                    "name": "Chat",
+                    "slug": "chat"
+                },
+                {
+                    "url": "/file-sharing/list",
+                    "name": "File Sharing",
+                    "slug": "file-sharing"
+                }
+            ]
+        }
+    ]
+}

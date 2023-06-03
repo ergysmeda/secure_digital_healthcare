@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class MenuServiceProvider extends ServiceProvider
@@ -23,13 +24,21 @@ class MenuServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // get all data from menu.json file
-        $verticalMenuJson = file_get_contents(base_path('resources/data/menu-data/verticalMenu.json'));
-        $verticalMenuData = json_decode($verticalMenuJson);
-        $horizontalMenuJson = file_get_contents(base_path('resources/data/menu-data/horizontalMenu.json'));
-        $horizontalMenuData = json_decode($horizontalMenuJson);
+        // Use a view composer to dynamically share the menuData with views
+           \View::composer('*', function ($view) {
+            $user = Auth::user();
+            $role = '';
 
-        // Share all menuData to all the views
-        \View::share('menuData', [$verticalMenuData, $horizontalMenuData]);
+            if ($user) {
+                $role = '_' . $user->role->role_name;
+            }
+
+            // Get the menu data based on the user's role
+            $verticalMenuJson = file_get_contents(base_path("resources/data/menu-data/verticalMenu{$role}.json"));
+            $verticalMenuData = json_decode($verticalMenuJson);
+            $horizontalMenuData = null;
+            // Share the menuData with the view
+            $view->with('menuData', [$verticalMenuData, $horizontalMenuData]);
+        });
     }
 }
