@@ -10,7 +10,17 @@ class PatientProfile extends Model
     use HasFactory;
 
     protected $table = 'patient_profiles';
-    public function user() {
+    protected $fillable = [
+        'user_id',
+        'dob',
+        'gender',
+        'blood_group',
+        'allergies',
+    ];
+
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

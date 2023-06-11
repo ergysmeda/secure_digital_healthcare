@@ -252,42 +252,8 @@
                                 chatBody.appendChild(chatContent);
                                 chat.appendChild(chatBody);
 
-                                const chatAvatar = document.createElement('div');
-                                chatAvatar.className = 'chat-avatar';
-                                const avatarSpan = document.createElement('span');
-                                avatarSpan.className = 'avatar box-shadow-1 cursor-pointer';
-                                const avatarImg = document.createElement('img');
-                                avatarImg.src = "{{ route('getProfilePicture', ['filename' => str_replace('images/', '', Auth::user()->profile_picture)]) }}"
 
-
-
-
-                                avatarImg.alt = 'avatar';
-                                avatarImg.height = 36;
-                                avatarImg.width = 36;
-                                avatarSpan.appendChild(avatarImg);
-                                chatAvatar.appendChild(avatarSpan);
-
-
-                                chat.appendChild(chatAvatar);
                             }else{
-                                chatContent.style = 'background:#337a4c';
-                                chatBody.appendChild(chatContent);
-                                const chatAvatar = document.createElement('div');
-                                chatAvatar.className = 'chat-avatar';
-                                const avatarSpan = document.createElement('span');
-                                avatarSpan.className = 'avatar box-shadow-1 cursor-pointer';
-                                const avatarImg = document.createElement('img');
-                                avatarImg.src = chatHeaderAvatar.src
-
-
-
-
-                                avatarImg.alt = 'avatar';
-                                avatarImg.height = 36;
-                                avatarImg.width = 36;
-                                avatarSpan.appendChild(avatarImg);
-                                chatAvatar.appendChild(avatarSpan);
 
                                 chat.appendChild(chatAvatar);
                                 chat.appendChild(chatBody);
@@ -342,32 +308,6 @@
                 });
 
 
-                // Create the avatar span
-                const avatarSpan = document.createElement('span');
-                avatarSpan.className = 'avatar';
-                const avatarImg = document.createElement('img');
-
-
-                fetch('/images/' + chat.data.profile_picture)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Image request failed');
-                        }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        avatarImg.src = URL.createObjectURL(blob);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-
-
-
-                avatarImg.height = 42;
-                avatarImg.width = 42;
-                avatarImg.alt = 'Generic placeholder image';
-                avatarSpan.appendChild(avatarImg);
 
                 // Create the chat info container
                 const chatInfo = document.createElement('div');
@@ -392,8 +332,6 @@
                 chatMeta.appendChild(chatTime);
                 chatMeta.appendChild(badge);
 
-                // Append the elements to the list item
-                listItem.appendChild(avatarSpan);
                 listItem.appendChild(chatInfo);
                 listItem.appendChild(chatMeta);
 
@@ -412,32 +350,7 @@
                 listItem.addEventListener('click', function() {
                     openChat(contact);
                 });
-                // Create the avatar span
-                const avatarSpan = document.createElement('span');
-                avatarSpan.className = 'avatar';
-                const avatarImg = document.createElement('img');
 
-                fetch('/images/' + contact.profile_picture)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Image request failed');
-                        }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        avatarImg.src = URL.createObjectURL(blob);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-
-
-
-
-                avatarImg.height = 42;
-                avatarImg.width = 42;
-                avatarImg.alt = 'Generic placeholder image';
-                avatarSpan.appendChild(avatarImg);
 
                 // Create the contact info container
                 const contactInfo = document.createElement('div');
@@ -462,8 +375,6 @@
                 contactMeta.appendChild(contactTime);
                 contactMeta.appendChild(badge);
 
-                // Append the elements to the list item
-                listItem.appendChild(avatarSpan);
                 listItem.appendChild(contactInfo);
                 listItem.appendChild(contactMeta);
 
@@ -495,6 +406,7 @@
                 .then(response => {
                     // Handle the response
                     if (response.ok) {
+                        $('#message_to_send').val('');
                         getActiveChats();
                         openChat(activeChat);
                     } else {

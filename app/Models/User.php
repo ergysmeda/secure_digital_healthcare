@@ -91,10 +91,5 @@ class User extends Authenticatable implements MustVerifyEmail
     public function medicalRecords() {
         return $this->hasMany(MedicalRecord::class);
     }
-    public function alerts() {
-        return $this->hasMany(Alert::class);
-    }
-    public function notifications() {
-        return $this->hasMany(Notification::class);
-    }
+
 }

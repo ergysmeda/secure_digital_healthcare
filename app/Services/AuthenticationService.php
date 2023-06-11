@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\PatientProfile;
+use App\Models\ProviderProfile;
 use App\Models\User;
+use App\Models\UserProfile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -61,12 +64,46 @@ class AuthenticationService
     public function registerUser($validator,$google2fa)
     {
 
-        return new User([
+
+        $user = new User([
             'name' => $validator['username'],
             'email' => $validator['email'],
             'password' =>  $validator['password'].$validator['email'] ,
             'google2fa_secret' =>  $google2fa->generateSecretKey(),
+            'profile_picture' =>  'test.jpg',
             'role_id' =>  $validator['role'],
         ]);
+        $user->save();
+
+        $userProfile = new UserProfile([
+            'user_id' => $user->id,
+            'name' => $validator['username'],
+            'contact_details' =>'',
+        ]);
+
+        $userProfile->save();
+
+        if($validator['role'] == '2'){
+            $patient_profile = new PatientProfile([
+                'user_id' => $user->id,
+                'dob' =>  '1900-01-01',
+                'gender' =>  '',
+                'blood_group' =>  '',
+                'allergies' =>  'No',
+            ]);
+
+            $patient_profile->save();
+
+        }elseif ($validator['role'] == '3'){
+            $provider_profile = new ProviderProfile([
+                'user_id' => $user->id,
+                'qualification' =>  '',
+                'specialty' =>  '',
+                'years_of_experience' =>  '0',
+            ]);
+            $provider_profile->save();
+        }
+
+        return $user;
     }
 }

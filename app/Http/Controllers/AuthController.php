@@ -86,7 +86,7 @@ class AuthController extends Controller
 
         $user = $this->authenticationService->registerUser($validator,$google2fa);
 
-        if ($user->save()) {
+        if ($user) {
             Auth::login($user); // Authenticate the user
             return redirect()->route('2fa')->with('user_id', $user->id);
         } else {

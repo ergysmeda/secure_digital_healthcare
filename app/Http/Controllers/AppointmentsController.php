@@ -79,6 +79,9 @@ class AppointmentsController extends Controller
             // add more fields as required
         ]);
 
+        if(!$request->location){
+            $request->location = 3;
+        }
         $schedule = new Schedule([
             'healthcare_professional_id' => $request->doctor_id,
             'location_id' => $request->location,

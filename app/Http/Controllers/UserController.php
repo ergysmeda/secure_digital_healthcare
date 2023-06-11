@@ -36,9 +36,9 @@ class UserController extends Controller
     {
 
         $users = [
-            'Admin'=> 0 ,
-            'Patient'=> 0 ,
-            'Doctor'=> 0 ,
+            'Admin' => 0,
+            'Patient' => 0,
+            'Doctor' => 0,
         ];
         $usersWithRoles = User::with('role:id,role_name')->get();
 
@@ -46,10 +46,11 @@ class UserController extends Controller
             $roleName = $user->role->role_name;
             $users[$roleName]++;
         }
-        return view('content.users.index' , ['users' => $users, 'roles' =>  Role::all()->toArray()]);
+        return view('content.users.index', ['users' => $users, 'roles' => Role::all()->toArray()]);
 
 
     }
+
     public function create(Request $request)
     {
         $google2fa = new Google2FA();
@@ -61,12 +62,13 @@ class UserController extends Controller
             'role' => 'required|exists:roles,id',
         ]);
 
+
         $validatedData['role'] = $request->input('role');
-        $validatedData['password'] = $request->input('username').'!@#1';
+        $validatedData['password'] = $request->input('username') . '!@#1';
 
         $user = $this->authenticationService->registerUser($validatedData, $google2fa);
 
-        if ($user->save()) {
+        if ($user) {
             return redirect()->route('users.list')->with('success', 'User created successfully.');
         } else {
             return redirect()->back()->withErrors('Failed to save user.')->withInput();
@@ -111,7 +113,6 @@ class UserController extends Controller
     }
 
 
-
     public function updateProfilePicture(Request $request)
     {
 
@@ -121,23 +122,23 @@ class UserController extends Controller
 
         $user = Auth::user();
 
-        if($request->hasFile('profile_picture')) {
+        if ($request->hasFile('profile_picture')) {
             $image = $request->file('profile_picture');
-            $name = time().'.'.$image->getClientOriginalExtension();
+            $name = time() . '.' . $image->getClientOriginalExtension();
 
             // Save the image to the 'local' disk in a directory named 'images'
             $path = $image->storeAs('images', $name, 'local');
 
             $user->profile_picture = $path;
             if ($user->save()) {
-                return redirect()->route('users.list')->with('success', 'User updated successfully.');
+                return redirect()->route('profile')->with('success', 'User updated successfully.');
             } else {
                 return redirect()->back()->withErrors('Failed to save user.')->withInput();
             }
 
         }
 
-        return back()->with('success','Image Upload successfully');
+        return back()->with('success', 'Image Upload successfully');
     }
 
 
@@ -180,7 +181,29 @@ class UserController extends Controller
         // Find the user by ID
         $user = User::findOrFail($id);
 
+        $userProfiles = $user->userProfile()->get();
+        foreach ($userProfiles as $userProfile) {
+            $userProfile->delete();
+        }
+
+        $patientProfiles = $user->patientProfile()->get();
+        foreach ($patientProfiles as $patientProfile) {
+            $patientProfile->delete();
+        }
+
+        $providerProfiles = $user->providerProfile()->get();
+        foreach ($providerProfiles as $providerProfile) {
+            $providerProfile->delete();
+        }
+
+
+        $filess = $user->files()->get();
+        foreach ($filess as $files) {
+            $files->delete();
+        }
+
         $user->delete();
+
 
         // Return a response indicating the success of the deletion
         return response()->json(['message' => 'User deleted successfully']);

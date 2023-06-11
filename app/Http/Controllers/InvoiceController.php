@@ -37,7 +37,11 @@ class InvoiceController extends Controller
 
         $payments = $paymentService->list($input);
 
-
+        if(auth()->user()->role_id == 2){
+            $payments = $payments->where('patient_id','=',auth()->user()->id);
+        }elseif(auth()->user()->role_id == 3){
+            $payments = $payments->where('doctor_id','=',auth()->user()->id);
+        }
 
         return DataTables::of($payments)->toJson();
 
