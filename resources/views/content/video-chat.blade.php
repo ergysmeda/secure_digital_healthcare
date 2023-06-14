@@ -27,11 +27,9 @@
 
             <div class="col-xl-12 col-lg-12 col-md-12 order-0 order-md-1">
                 <div class="card">
-                    @if(!isset($error)){
-                    <div id="video-chat-container">
-                        <div id="local-media"></div>
-                        <div id="remote-media"></div>
-                    </div>
+                    @if(!isset($error))
+                    <div id="video-container"></div>
+
                     @else
                         <div>
                             <p class="error">{{$error}}</p>
@@ -71,41 +69,55 @@
 
 @section('page-script')
     @if(!isset($error)){
-    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.0.0-beta1/twilio-video.min.js"></script>
+    <script src="//media.twiliocdn.com/sdk/js/video/releases/2.0.0-beta10/twilio-video.min.js"></script>
+
     <script>
-        const localMediaContainer = document.getElementById('local-media');
-        const remoteMediaContainer = document.getElementById('remote-media');
 
-        Twilio.Video.createLocalTracks().then(localTracks => {
-            return Twilio.Video.connect('{{ $accessToken }}', {
-                name: '{{$roomName}}',
-                tracks: localTracks
-            });
-        }).then(room => {
-            console.log('test');
-            // Attach the Participant's Media to a <div> element.
-            room.on('participantConnected', participant => {
-                console.log(`Participant "${participant.identity}" connected`);
+        const Video = Twilio.Video;
 
-                participant.tracks.forEach(publication => {
-                    if (publication.isSubscribed) {
-                        const track = publication.track;
-                        remoteMediaContainer.appendChild(track.attach());
-                    }
-                });
 
-                participant.on('trackSubscribed', track => {
-                    remoteMediaContainer.appendChild(track.attach());
-                });
-            });
+        Video.connect('{{ $accessToken }}', { name: '{{$roomName}}' }).then(room => {
+            console.log('Connected to Room "%s"', room.name);
 
-            room.localParticipant.tracks.forEach(publication => {
-                const track = publication.track;
-                localMediaContainer.appendChild(track.attach());
-            });
+            room.participants.forEach(participantConnected);
+            room.on('participantConnected', participantConnected);
 
-            console.log(`Connected to Room "${room.name}"`);
+            room.on('participantDisconnected', participantDisconnected);
+            room.once('disconnected', error => room.participants.forEach(participantDisconnected));
         });
+
+        function participantConnected(participant) {
+            console.log('Participant "%s" connected', participant.identity);
+
+            const div = document.createElement('div');
+            div.id = participant.sid;
+            div.innerText = participant.identity;
+
+            participant.on('trackSubscribed', track => trackSubscribed(div, track));
+            participant.on('trackUnsubscribed', trackUnsubscribed);
+
+            participant.tracks.forEach(publication => {
+                if (publication.isSubscribed) {
+                    trackSubscribed(div, publication.track);
+                }
+            });
+
+            document.getElementById('video-container').appendChild(div);
+        }
+
+
+        function participantDisconnected(participant) {
+            console.log('Participant "%s" disconnected', participant.identity);
+            document.getElementById(participant.sid).remove();
+        }
+
+        function trackSubscribed(div, track) {
+            div.appendChild(track.attach());
+        }
+
+        function trackUnsubscribed(track) {
+            track.detach().forEach(element => element.remove());
+        }
     </script>
     @endif
 @endsection

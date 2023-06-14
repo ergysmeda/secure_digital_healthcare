@@ -176,11 +176,6 @@
                 receiverId = message_data.receiver_id;
             }
 
-            console.log(senderId)
-            console.log(receiverId)
-
-
-
             $('.active-chat').attr('data-sender', senderId);
             $('.active-chat').attr('data-receiver', receiverId);
             fetch(`/chat/getMessages?sender_id=${senderId}&receiver_id=${receiverId}`, {
@@ -254,8 +249,8 @@
 
 
                             }else{
-
-                                chat.appendChild(chatAvatar);
+                                chatContent.style = 'background:#337a4c';
+                                chatBody.appendChild(chatContent);
                                 chat.appendChild(chatBody);
                             }
 
@@ -425,11 +420,7 @@
                     // Handle network or other errors
                     console.error('Error:', error);
                 });
-            console.log(senderId,receiverId)
         }
-
-        // Enable pusher logging - don't include this in production
-        Pusher.logToConsole = true;
 
         var pusher = new Pusher('b3e43753da501597ed00', {
             cluster: 'eu'

@@ -26,18 +26,19 @@ class Appointment extends Model
     {
         $now = Carbon::now();
         $nextFifteenMinutes = $now->copy()->addMinutes(59);
+        $now =  $now->copy()->subMinutes(59);
+
 
 
         if($userType == '2') {
             $appointments = Appointment::where('patient_id', $userId)
-                ->whereBetween('appointment_time', [date("Y-m-d").' 00:00:00', $nextFifteenMinutes])
-                ->where('online_or_in_presence',false)
+                ->whereBetween('appointment_time', [$now, $nextFifteenMinutes])
                 ->first();
+
         } else if($userType == '3') {
 
             $appointments = Appointment::where('healthcare_professional_id', $userId)
-                ->whereBetween('appointment_time', [date("Y-m-d").' 00:00:00', $nextFifteenMinutes])
-                ->where('online_or_in_presence',false)
+                ->whereBetween('appointment_time', [$now, $nextFifteenMinutes])
                 ->first();
         }
 

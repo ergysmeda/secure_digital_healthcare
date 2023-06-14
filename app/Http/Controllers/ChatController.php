@@ -124,6 +124,7 @@ class ChatController extends Controller
                 ->where('receiver_id', $userID);
         })->get()->toArray();
 
+
         $chats = [];
 
         foreach ($messageList as $message) {
@@ -154,6 +155,7 @@ class ChatController extends Controller
             $chats[$otherId]['data']['profile_picture'] = str_replace('images/','',$otherPerson->profile_picture);
             $chats[$otherId]['data']['role'] = $otherPerson->role->role_name;
         }
+
         return $chats;
 
     }
